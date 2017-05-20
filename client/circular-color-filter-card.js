@@ -12,7 +12,7 @@ class CircularCard {
     render() {
         const r = Math.min(this.w,this.h)/3
         this.context.clearRect(0,0,this.w,this.h)
-        this.context.fillStyle = 'white'
+        this.context.fillStyle = '#E0E0E0'
         this.context.fillRect(0,0,this.w,this.h)
         this.context.save()
         this.context.beginPath()
