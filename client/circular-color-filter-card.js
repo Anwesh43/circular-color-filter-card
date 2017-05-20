@@ -5,7 +5,9 @@ class CircularCard {
         document.body.appendChild(this.img)
         this.w = w
         this.h = h
-        this.colorFilter = new colorFilter(color,w,h)
+        this.colorFilter = new ColorFilter(color,w,h,()=>{
+            clearInterval(this.interval)
+        })
     }
     render() {
         const r = Math.min(this.w,this.h)/3
@@ -19,6 +21,7 @@ class CircularCard {
         this.context.drawImage(this.image,0,0,this.w,this.h)
         this.context.restore()
         this.colorFilter.draw(context)
+        this.img.src = this.canvas.toDataURL()
     }
     create() {
         this.canvas = document.createElement('canvas')
@@ -26,17 +29,24 @@ class CircularCard {
         this.canvas.height = this.h
         this.context = this.canvas.getContext('2d')
         this.image = new Image()
+        this.img.onmousedown = () =>{
+            this.colorFilter.startMoving()
+            this.interval = setInterval(()=>{
+                this.render()
+            },100)
+        }
         this.image.onload = ()=>{
             this.render()
         }
     }
     class ColorFilter {
-        constructor(color,w,h) {
+        constructor(color,w,h,animEndCb) {
             this.deg = 0
             this.w = w
             this.h = h
             this.color = color
             this.dir = 0
+            this.animEndCb = animEndCb
         }
         draw(context,r) {
             context.save()
@@ -58,11 +68,14 @@ class CircularCard {
             context.restore()
         }
         startMoving() {
-            if(this.deg == 0) {
-                this.dir = 1
-            }
-            else {
-                this.dir = -1
+            if(this.dir == 0) {
+                if(this.deg == 0) {
+                    this.dir = 1
+                }
+                else {
+                    this.dir = -1
+                }
+                this.animEndCb()
             }
         }
         update() {
