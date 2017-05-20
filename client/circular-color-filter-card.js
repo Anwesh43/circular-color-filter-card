@@ -5,8 +5,7 @@ class CircularCard {
         document.body.appendChild(this.img)
         this.w = w
         this.h = h
-        this.scale = 0
-        this.color = color
+        this.colorFilter = new colorFilter(color,w,h)
     }
     render() {
         const r = Math.min(this.w,this.h)/3
@@ -19,15 +18,7 @@ class CircularCard {
         this.context.clipPath()
         this.context.drawImage(this.image,0,0,this.w,this.h)
         this.context.restore()
-        this.context.save()
-        this.context.translate(this.w/2,this.h/2)
-        this.context.scale(this.scale,this.scale)
-        this.context.beginPath()
-        this.context.arc(0,0,r,0,2*Math.PI)
-        this.context.fillStyle = this.color
-        this.context.globalAlpha = 0.5
-        this.context.fill()
-        this.context.restore()
+        this.colorFilter.draw(context)
     }
     create() {
         this.canvas = document.createElement('canvas')
@@ -37,6 +28,48 @@ class CircularCard {
         this.image = new Image()
         this.image.onload = ()=>{
             this.render()
+        }
+    }
+    class ColorFilter {
+        constructor(color,w,h) {
+            this.deg = 0
+            this.w = w
+            this.h = h
+            this.color = color
+            this.dir = 0
+        }
+        draw(context,r) {
+            context.save()
+            context.translate(this.w/2,this.h/2)
+            context.rotate(this.deg*Math.PI/180)
+            context.beginPath()
+            for(var i = 0;i<=deg;i+=10) {
+                const x = r*Math.cos(i*Math.PI/180),y = r*Math.sin(i*Math.PI/180)
+                if(i == 0) {
+                    context.moveTo(x,y)
+                }
+                else {
+                    context.lineTo(x,y)
+                }
+            }
+            context.fillStyle = this.color
+            context.globalAlpha = 0.5
+            context.fill()
+            context.restore()
+        }
+        startMoving() {
+            if(this.deg == 0) {
+                this.dir = 1
+            }
+            else {
+                this.dir = -1
+            }
+        }
+        update() {
+            this.deg += 30*this.dir
+            if(this.deg >= 360 || this.deg <= 0) {
+                this.dir = 0
+            }
         }
     }
 }
