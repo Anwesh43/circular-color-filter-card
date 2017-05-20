@@ -17,10 +17,11 @@ class CircularCard {
         this.context.save()
         this.context.beginPath()
         this.context.arc(this.w/2,this.h/2,r,0,2*Math.PI)
-        this.context.clipPath()
+        this.context.clip()
         this.context.drawImage(this.image,0,0,this.w,this.h)
         this.context.restore()
-        this.colorFilter.draw(context)
+        this.colorFilter.draw(this.context,r)
+        this.colorFilter.update()
         this.img.src = this.canvas.toDataURL()
     }
     create() {
@@ -29,6 +30,7 @@ class CircularCard {
         this.canvas.height = this.h
         this.context = this.canvas.getContext('2d')
         this.image = new Image()
+        this.image.src = this.src
         this.img.onmousedown = () =>{
             this.colorFilter.startMoving()
             this.interval = setInterval(()=>{
@@ -52,19 +54,16 @@ class ColorFilter {
     draw(context,r) {
         context.save()
         context.translate(this.w/2,this.h/2)
-        context.rotate(this.deg*Math.PI/180)
-        context.beginPath()
-        for(var i = 0;i<=deg;i+=10) {
-            const x = r*Math.cos(i*Math.PI/180),y = r*Math.sin(i*Math.PI/180)
-            if(i == 0) {
-                context.moveTo(x,y)
-            }
-            else {
-                context.lineTo(x,y)
-            }
-        }
+        //context.rotate(this.deg*Math.PI/180)
         context.fillStyle = this.color
         context.globalAlpha = 0.5
+        context.beginPath()
+        context.moveTo(0,0)
+        for(var i = 0;i<=this.deg;i+=10) {
+            const x = r*Math.cos(i*Math.PI/180),y = r*Math.sin(i*Math.PI/180)
+            context.lineTo(x,y)
+        }
+
         context.fill()
         context.restore()
     }
@@ -86,4 +85,3 @@ class ColorFilter {
         }
     }
 }
-    
